@@ -1,1 +1,1 @@
-# Java-CRUD
+# Collection of Java projects when I started until now. From procedural to more complex features such as the Stream API, Object-Oriented Programming, Exceptions, throw, and try-catch. More to come soon.
