@@ -7,7 +7,7 @@ import java.util.Iterator;
 public class Junior extends Student {
     private int internshipHours;
     private String specialization;
-    private List<String> technicalElectives;
+    private final List<String> technicalElectives;
 
     public Junior(int studentID, String firstName, String middleName, String lastName, int age, YearLevel yearLevel, int internshipHours, String specialization, List<String> technicalElectives) {
         super(studentID, firstName, middleName, lastName, age, yearLevel);
