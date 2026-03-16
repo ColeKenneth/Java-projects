@@ -7,14 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StudentStorage {
-    private static final String DB_PATH = "jdbc:mysql://localhost:3306/studentsystem";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "coleadmin";
 
     public static void addStudent(Student s) {
         String query = "INSERT INTO student_base (first_name, middle_name, last_name, age, year_level) VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection(DB_PATH, USERNAME, PASSWORD)) {
+        try (Connection conn = DriverManager.getConnection(Config.DB_PATH, Config.USERNAME, Config.PASSWORD)) {
             conn.setAutoCommit(false);
 
             try (PreparedStatement pstmtBase = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -104,7 +101,7 @@ public class StudentStorage {
         List<Student> students = new ArrayList<>();
         String viewQuery = "SELECT * FROM list_of_students";
 
-        try (Connection conn = DriverManager.getConnection(DB_PATH, USERNAME, PASSWORD);
+        try (Connection conn = DriverManager.getConnection(Config.DB_PATH, Config.USERNAME, Config.PASSWORD);
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(viewQuery)) {
 
@@ -183,7 +180,7 @@ public class StudentStorage {
     public static boolean updateStudentName(int studentID, String firstname, String middlename, String lastname) {
         String query = "UPDATE student_base SET first_name = ?, middle_name = ?, last_name = ? WHERE student_id = ?";
 
-        try (Connection conn = DriverManager.getConnection(DB_PATH, USERNAME, PASSWORD);
+        try (Connection conn = DriverManager.getConnection(Config.DB_PATH, Config.USERNAME, Config.PASSWORD);
             PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, firstname);
@@ -209,7 +206,7 @@ public class StudentStorage {
     public static boolean updateStudentAge(int studentID, int age) {
         String query = "UPDATE student_base SET age = ? WHERE student_id = ?";
 
-        try (Connection conn = DriverManager.getConnection(DB_PATH, USERNAME, PASSWORD);
+        try (Connection conn = DriverManager.getConnection(Config.DB_PATH, Config.USERNAME, Config.PASSWORD);
             PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setInt(1, age);
             pstmt.setInt(2, studentID);
@@ -233,7 +230,7 @@ public class StudentStorage {
     public static boolean updateFreshman(int studentID, boolean orientationComplete, String highSchoolOrigin, double entranceExamScore) {
         String query = "UPDATE freshman SET orientation_complete = ?, high_school_origin = ?, entrance_exam_score = ? WHERE student_id = ?";
 
-        try (Connection conn = DriverManager.getConnection(DB_PATH, USERNAME, PASSWORD);
+        try (Connection conn = DriverManager.getConnection(Config.DB_PATH, Config.USERNAME, Config.PASSWORD);
             PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setBoolean(1, orientationComplete);
             pstmt.setString(2, highSchoolOrigin);
@@ -258,7 +255,7 @@ public class StudentStorage {
     public static boolean updateSophomore(int studentID, String declaredMajor, int generalEducationCredits, boolean eligibleForMinor) {
         String query = "UPDATE sophomore SET declared_major = ?, general_ed_credits = ?, eligible_for_minor = ? WHERE student_id = ?";
 
-        try (Connection conn = DriverManager.getConnection(DB_PATH, USERNAME, PASSWORD);
+        try (Connection conn = DriverManager.getConnection(Config.DB_PATH, Config.USERNAME, Config.PASSWORD);
             PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, declaredMajor);
@@ -284,7 +281,7 @@ public class StudentStorage {
     public static boolean updateJunior(int studentID, int internshipHours, String specialization) {
         String query = "UPDATE junior SET internship_hours = ?, specialization = ? WHERE student_id = ?";
 
-        try (Connection conn = DriverManager.getConnection(DB_PATH, USERNAME, PASSWORD);
+        try (Connection conn = DriverManager.getConnection(Config.DB_PATH, Config.USERNAME, Config.PASSWORD);
             PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setInt(1, internshipHours);
@@ -310,7 +307,7 @@ public class StudentStorage {
         String deleteQuery = "DELETE FROM junior_electives WHERE student_id = ?";
         String insertQuery = "INSERT INTO junior_electives (student_id, elective_name) VALUES (?, ?)";
 
-        try (Connection conn = DriverManager.getConnection(DB_PATH, USERNAME, PASSWORD)) {
+        try (Connection conn = DriverManager.getConnection(Config.DB_PATH, Config.USERNAME, Config.PASSWORD)) {
             conn.setAutoCommit(false); // Start the shield
 
             try (PreparedStatement deletePstmt = conn.prepareStatement(deleteQuery);
@@ -340,7 +337,7 @@ public class StudentStorage {
     public static boolean updateSenior(int studentID, String thesisTitle, LocalDate expectedGraduationDate, boolean careerReady) {
         String query = "UPDATE senior SET thesis_title = ?, expected_graduation_date = ?, career_ready = ? WHERE student_id = ?";
 
-        try (Connection conn = DriverManager.getConnection(DB_PATH, USERNAME, PASSWORD);
+        try (Connection conn = DriverManager.getConnection(Config.DB_PATH, Config.USERNAME, Config.PASSWORD);
             PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, thesisTitle);
@@ -366,7 +363,7 @@ public class StudentStorage {
     public static boolean deleteStudent(int studentID) {
         String query = "DELETE FROM student_base WHERE student_id = ?";
 
-        try (Connection conn = DriverManager.getConnection(DB_PATH, USERNAME, PASSWORD);
+        try (Connection conn = DriverManager.getConnection(Config.DB_PATH, Config.USERNAME, Config.PASSWORD);
             PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setInt(1, studentID);
