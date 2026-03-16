@@ -22,7 +22,7 @@ public class Student {
     }
 
     public void setStudentID(int studentID) {
-        if (studentID <= 0) {
+        if (studentID < 0) {
             throw new IllegalArgumentException("Student ID cannot be zero or a negative value.");
         }
         this.studentID = studentID;
