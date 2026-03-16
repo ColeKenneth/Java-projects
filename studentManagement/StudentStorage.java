@@ -303,7 +303,7 @@ public class StudentStorage {
         }
     }
 
-    public static void updateElectives(int studentID, List<String> electives) {
+    public static boolean updateElectives(int studentID, List<String> electives) {
         String deleteQuery = "DELETE FROM junior_electives WHERE student_id = ?";
         String insertQuery = "INSERT INTO junior_electives (student_id, elective_name) VALUES (?, ?)";
 
@@ -324,13 +324,16 @@ public class StudentStorage {
                 insertPstmt.executeBatch();
                 conn.commit();
                 System.out.println("Electives updated successfully!");
+                return true;
 
             } catch (SQLException e) {
                 conn.rollback();
                 System.err.println("Update failed. Transaction rolled back: " + e.getMessage());
+                return false;
             }
         } catch (SQLException e) {
             System.err.println("Connection Error: " + e.getMessage());
+            return false;
         }
     }
 
