@@ -308,7 +308,7 @@ public class StudentStorage {
         String insertQuery = "INSERT INTO junior_electives (student_id, elective_name) VALUES (?, ?)";
 
         try (Connection conn = DriverManager.getConnection(Config.DB_PATH, Config.USERNAME, Config.PASSWORD)) {
-            conn.setAutoCommit(false); // Start the shield
+            conn.setAutoCommit(false); 
 
             try (PreparedStatement deletePstmt = conn.prepareStatement(deleteQuery);
                  PreparedStatement insertPstmt = conn.prepareStatement(insertQuery)) {
