@@ -42,3 +42,5 @@ db_config.properties
 # --- OS Specifics ---
 .DS_Store
 Thumbs.db
+
+Config.java
