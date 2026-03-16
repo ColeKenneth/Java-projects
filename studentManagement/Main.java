@@ -1,4 +1,5 @@
 package studentManagement;
+
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -9,7 +10,6 @@ import java.util.Scanner;
 public class Main {
     private static final Scanner sc = new Scanner(System.in);
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("MM-dd-yyyy");
-    private static final StudentStorage student = new StudentStorage();
 
     public static void main(String[] args) {
         int choice;
@@ -76,9 +76,16 @@ public class Main {
         }
     }
 
+    private static void processUpdateResult(boolean success) {
+        if (success) {
+            System.out.println("Data updated successfully!");
+        } else {
+            System.out.println("Student not found!");
+        }
+    }
+
     public static void addStudent() {
         Student newStudent = null;
-        int studentID = getNumber("Student ID: ");
         System.out.print("First Name: ");
         String firstName = sc.nextLine().trim();
 
@@ -89,8 +96,6 @@ public class Main {
         String lastName = sc.nextLine().trim();
 
         int age = getNumber("Age: ");
-
-
         YearLevel yearLevel = getYearLevel();
 
         boolean isOrientationComplete = false;
@@ -114,17 +119,18 @@ public class Main {
                 System.out.print("Last School Attended (High School): ");
                 highSchoolOrigin = sc.nextLine().trim();
 
-
-                try {
-                    System.out.print("Entrance Exam Score: ");
-                    entranceExamScore = Double.parseDouble(sc.nextLine());
-                } catch (NumberFormatException e) {
-                    System.err.println("Your score must be a number.");
-                    entranceExamScore = 0.0;
+                while (true) {
+                    try {
+                        System.out.print("Entrance Exam Score: ");
+                        entranceExamScore = Double.parseDouble(sc.nextLine());
+                        break;
+                    } catch (NumberFormatException e) {
+                        System.err.println("Your score must be a number.");
+                        entranceExamScore = 0.0;
+                    }
                 }
-
-
-                newStudent = new Freshman(studentID, firstName, middleName, lastName, age, yearLevel, isOrientationComplete, highSchoolOrigin, entranceExamScore);
+                newStudent = new Freshman(0, firstName, middleName, lastName, age,
+                        yearLevel, isOrientationComplete, highSchoolOrigin, entranceExamScore);
             }
             case SOPHOMORE -> {
                 System.out.print("Declared Major: ");
@@ -135,7 +141,7 @@ public class Main {
                 System.out.print("Eligible for Minor? (true/false): ");
                 isEligibleForMinor = Boolean.parseBoolean(sc.nextLine());
 
-                newStudent = new Sophomore(studentID, firstName, middleName, lastName, age, yearLevel, declaredMajor, generalEducationCredits, isEligibleForMinor);
+                newStudent = new Sophomore(0, firstName, middleName, lastName, age, yearLevel, declaredMajor, generalEducationCredits, isEligibleForMinor);
             }
             case JUNIOR -> {
                 internshipHours = getNumber("Internship Hours: ");
@@ -156,7 +162,7 @@ public class Main {
                         electives.add(elective);
                     }
                 }
-                newStudent = new Junior(studentID, firstName, middleName, lastName, age, yearLevel, internshipHours, specialization, electives);
+                newStudent = new Junior(0, firstName, middleName, lastName, age, yearLevel, internshipHours, specialization, electives);
 
             }
             case SENIOR -> {
@@ -174,62 +180,190 @@ public class Main {
                 System.out.print("Is Career Ready? (true/false): ");
                 isCareerReady = Boolean.parseBoolean(sc.nextLine());
 
-                newStudent = new Senior(studentID, firstName, middleName, lastName, age, yearLevel, thesisTitle, expectedGraduationDate, isCareerReady);
+                newStudent = new Senior(0, firstName, middleName, lastName, age, yearLevel, thesisTitle, expectedGraduationDate, isCareerReady);
             }
 
         }
         if (newStudent != null) {
-            student.addStudent(newStudent);
+            StudentStorage.addStudent(newStudent);
         }
 
     }
 
     public static void viewStudents() {
-        student.listStudents();
+        List<Student> students = StudentStorage.getAllStudents();
+        if (students.isEmpty()) {
+            System.out.println("No students found in the records.");
+        } else {
+            System.out.println("\nENROLLED STUDENTS");
+            for (Student s : students) {
+                System.out.println(s);
+            }
+        }
     }
 
     public static void deleteMenu() {
         int studentID = getNumber("Enter student ID: ");
-        student.deleteStudent(studentID);
+        StudentStorage.deleteStudent(studentID);
     }
 
     public static void updateMenu() {
-        try {
-            System.out.println("---UPDATE MENU---");
-            System.out.println("1. Update Name \n2. Update Age \n3. Update Year Level");
-            int choice = getNumber("Select a number to update the following: ");
+        System.out.println("""
+                UPDATE MENU
+                1. Update Student Base
+                2. Update Age
+                3. Update Freshman
+                4. Update Sophomore
+                5. Update Junior
+                6. Update Electives
+                7. Update Senior
+                """);
+        int choice = getNumber("Select from the menu to update: ");
 
-            switch (choice) {
-                case 1 -> {
-                    System.out.println("---UPDATE STUDENT'S NAME---");
-                    int id = getNumber("Student ID: ");
-                    System.out.print("First Name: ");
-                    String firstName = sc.nextLine().trim();
+        switch (choice) {
+            case 1 -> {
+                System.out.println("UPDATE STUDENT BASE");
+                int studentID = getNumber("Enter Student ID to update: ");
+                System.out.print("First Name: ");
+                String firstName = sc.nextLine().trim();
 
-                    System.out.print("Last Name: ");
-                    String lastName = sc.nextLine().trim();
+                System.out.print("Middle Name: ");
+                String middleName = sc.nextLine().trim();
 
-                    student.updateStudentName(id, firstName, lastName);
+                System.out.print("Last Name: ");
+                String lastName = sc.nextLine().trim();
+
+                try {
+                    boolean success = StudentStorage.updateStudentName(studentID, firstName, middleName, lastName);
+                   processUpdateResult(success);
+                } catch (Exception e) {
+                    System.err.println("ERROR: " + e.getMessage());
                 }
-                case 2 -> {
-                    System.out.println("---UPDATE AGE---");
-                    int id = getNumber("Student ID: ");
-                    int age = getNumber("Age: ");
-                    student.updateStudentAge(id, age);
-                }
-                case 3 -> {
-                    System.out.println("---UPDATE YEAR LEVEL---");
-                    int id = getNumber("Student ID: ");
-                    YearLevel yearLevel = getYearLevel();
-
-                    student.updateYearLevel(id,yearLevel);
-                }
-                default -> System.out.println("Invalid choice!");
             }
-        } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
-        }
+            case 2 -> {
+                System.out.println("UPDATE STUDENT'S AGE");
+                int studentID = getNumber("Enter Student ID to update: ");
+                int age = getNumber("Age: ");
 
+                try {
+                    boolean success = StudentStorage.updateStudentAge(studentID, age);
+                    processUpdateResult(success);
+                } catch (Exception e) {
+                    System.err.println("ERROR: " + e.getMessage());
+                }
+            }
+            case 3 -> {
+                System.out.println("UPDATE FRESHMAN");
+                int studentID = getNumber("Enter Student ID to update: ");
+                System.out.println("Is Orientation Complete? (true/false): ");
+                boolean orientationComplete = Boolean.parseBoolean(sc.nextLine());
+
+                System.out.print("High School Origin: ");
+                String highSchoolOrigin = sc.nextLine().trim();
+
+                double entranceExamScore = 0.0;
+                while (true) {
+                    try {
+                        System.out.print("Entrance Exam Score: ");
+                        entranceExamScore = Double.parseDouble(sc.nextLine());
+                        break;
+                    } catch (NumberFormatException e) {
+                        System.err.println("ERROR: " + e.getMessage());
+
+                    }
+                }
+
+                try {
+                    boolean success = StudentStorage.updateFreshman(studentID, orientationComplete, highSchoolOrigin, entranceExamScore);
+                    processUpdateResult(success);
+                } catch (Exception e) {
+                    System.err.println("ERROR: " + e.getMessage());
+                }
+            }
+            case 4 -> {
+                System.out.println("UPDATE SOPHOMORE");
+                int studentID = getNumber("Enter student ID to update: ");
+                System.out.print("Declared Major: ");
+                String declaredMajor = sc.nextLine().trim();
+
+                int generalEducationCredits = getNumber("General Education Credits: ");
+
+                System.out.print("Eligible for Minor? (true/false): ");
+                boolean eligibleForMinor = Boolean.parseBoolean(sc.nextLine());
+
+                try {
+                    boolean success = StudentStorage.updateSophomore(studentID, declaredMajor, generalEducationCredits, eligibleForMinor);
+                    processUpdateResult(success);
+                } catch (Exception e) {
+                    System.err.println("ERROR: " + e.getMessage());
+                }
+            }
+            case 5 -> {
+                System.out.println("UPDATE JUNIOR");
+                int studentID = getNumber("Enter student ID to update: ");
+                int internshipHours = getNumber("Internship Hours: ");
+                System.out.print("Specialization: ");
+                String specialization = sc.nextLine().trim();
+
+                try {
+                    boolean success = StudentStorage.updateJunior(studentID, internshipHours, specialization);
+                    processUpdateResult(success);
+                } catch (Exception e) {
+                    System.err.println("ERROR: " + e.getMessage());
+                }
+
+            }
+            case 6 -> {
+                System.out.println("UPDATE ELECTIVES");
+                int studentID = getNumber("Enter student ID to update: ");
+
+                List<String> updatedElectives = new ArrayList<>();
+                String input;
+
+                System.out.println("Enter your updated electives (type 'done' to finish).");
+                while (true) {
+                    System.out.print("> ");
+                    input = sc.nextLine().trim();
+
+                    if (input.equalsIgnoreCase("done")) {
+                        break;
+                    }
+
+                    if (!input.isEmpty()) {
+                        updatedElectives.add(input);
+                    }
+                }
+
+                try {
+                    boolean success = StudentStorage.updateElectives(studentID, updatedElectives);
+                    processUpdateResult(success);
+                } catch (Exception e) {
+                    System.err.println("ERROR: " + e.getMessage());
+                }
+            }
+            case 7 -> {
+                System.out.println("UPDATE SENIOR");
+                int studentID = getNumber("Enter student ID to update: ");
+
+                System.out.print("Thesis Title: ");
+                String thesisTitle = sc.nextLine().trim();
+
+                System.out.print("Expected Date of Graduation (FORMAT: MM-dd-yyyy): ");
+                String updatedDate = sc.nextLine().trim();
+
+                System.out.print("Is Career Ready? (true/false): ");
+                boolean careerReady = Boolean.parseBoolean(sc.nextLine());
+
+                try {
+                    LocalDate expectedGraduationDate = LocalDate.parse(updatedDate, format);
+                    boolean success = StudentStorage.updateSenior(studentID, thesisTitle, expectedGraduationDate, careerReady);
+                    processUpdateResult(success);
+                } catch (Exception e) {
+                    System.err.println("ERROR: " + e.getMessage());
+                }
+            }
+            default -> System.out.println("Invalid choice!");
+        }
     }
 }
 
