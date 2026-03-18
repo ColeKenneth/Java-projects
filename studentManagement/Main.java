@@ -186,7 +186,6 @@ public class Main {
             }
 
         } catch (IllegalArgumentException e) {
-            // CATCHES: Age < 0, Empty Names, etc.
             System.err.println("\nDATA ERROR: " + e.getMessage());
             System.out.println("Returning to main menu...");
         } catch (SQLException e) {
