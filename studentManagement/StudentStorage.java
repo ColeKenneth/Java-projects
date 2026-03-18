@@ -8,7 +8,7 @@ import java.util.List;
 
 public class StudentStorage {
 
-    public static void addStudent(Student s) {
+    public static void addStudent(Student s) throws SQLException {
         String query = "INSERT INTO student_base (first_name, middle_name, last_name, age, year_level) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(Config.DB_PATH, Config.USERNAME, Config.PASSWORD)) {
@@ -37,10 +37,8 @@ public class StudentStorage {
 
             } catch (SQLException e) {
                 conn.rollback();
-                System.err.println("An error occurred while saving your data.");
+                throw e;
             }
-        } catch (SQLException e) {
-            System.err.println("Database Error: " + e.getMessage());
         }
     }
 
@@ -308,7 +306,7 @@ public class StudentStorage {
         String insertQuery = "INSERT INTO junior_electives (student_id, elective_name) VALUES (?, ?)";
 
         try (Connection conn = DriverManager.getConnection(Config.DB_PATH, Config.USERNAME, Config.PASSWORD)) {
-            conn.setAutoCommit(false); 
+            conn.setAutoCommit(false);
 
             try (PreparedStatement deletePstmt = conn.prepareStatement(deleteQuery);
                  PreparedStatement insertPstmt = conn.prepareStatement(insertQuery)) {
@@ -363,7 +361,7 @@ public class StudentStorage {
         }
     }
 
-    public static boolean deleteStudent(int studentID) {
+    public static boolean deleteStudent(int studentID) throws SQLException {
         String query = "DELETE FROM student_base WHERE student_id = ?";
 
         try (Connection conn = DriverManager.getConnection(Config.DB_PATH, Config.USERNAME, Config.PASSWORD);
@@ -381,10 +379,25 @@ public class StudentStorage {
                 return false;
             }
 
-        } catch (SQLException e) {
-            System.err.println("ERROR: " + e.getMessage());
-            return false;
         }
 
+    }
+
+    public static boolean exists(int studentID) {
+        String query = "SELECT student_id FROM student_base WHERE student_id = ?";
+
+        try (Connection conn = DriverManager.getConnection(Config.DB_PATH, Config.USERNAME, Config.PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, studentID);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Database check failed: " + e.getMessage());
+            return false;
+        }
     }
 }
